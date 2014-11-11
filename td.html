@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Tower Defense</title>
+    </head>
+    <body>
+        <h1>Tower Defense</h1>
+        
+        <canvas id="towerdefense" width="1000" height="600" style="border:1px solid #000;"></canvas>
+        <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+        <script src="https://code.createjs.com/easeljs-0.7.1.min.js"></script>
+        
+        <script>
+            //Variables
+            var oTreeBitmap = null;
+            var oCastleBitmap = null;
+            var oWorld = { x: 0, y: 0};
+            var nVelX = 30;
+            var nVelY = 20;
+            var oStage = null;
+
+            //Place the objects function
+            function placeObjects(){
+                var nObjects = oStage.getNumChildren();
+                for (var n = 0; n < nObjects; n++){
+                    oChild = oStage.getChildAt(n);
+                    oChild.x = oChild.worldX - oWorld.x;
+                    oChild.y = oChild.worldY - oWorld.y;
+                }
+            }
+
+            // This detects and controls the movement of the canvas by pressing the arrow keys found on the numpad
+            // numpad8 = up, numpad2 = down, numpad4 = left, and numpad6 = right
+            jQuery(document).on("keypress", function(e){
+                switch (e.which){
+                    case 56:
+                        oWorld.y -= nVelY; 
+                        break;
+                    case 50:
+                        oWorld.y += nVelY; 
+                        break;
+                    case 54:
+                        oWorld.x += nVelX; 
+                        break;
+                    case 52:
+                        oWorld.x -= nVelX; 
+                        break;
+                }
+                // Stops the canvas moving infinitly in a direction (ie. border control)
+                if (oWorld.x < 0 )
+                    oWorld.x = 0;
+                if (oWorld.y < 0 )
+                    oWorld.y = 0;
+                if (oWorld.x > 10000 )
+                    oWorld.x = 10000;
+                if (oWorld.y > 10000 )
+                    oWorld.y = 10000;
+                // dubug line
+                //console.log(e.which);
+            });
+
+            // Create the images on the stage
+            jQuery(document).ready(function () {
+                oStage = new createjs.Stage("towerdefense");
+                var oTree = new Image();
+                oTree.src = "images/tree.jpg"
+                oTree.onload = function () {
+                    oTreeBitmap = new createjs.Bitmap(oTree);
+                    oStage.addChild(oTreeBitmap);
+                    oTreeBitmap.worldX = oTreeBitmap.worldY = 0;
+                    oStage.update();
+                };
+
+                var oCastle = new Image();
+                oCastle.src = "images/castle.jpg"
+                oCastle.onload = function () {
+                    oCastleBitmap = new createjs.Bitmap(oCastle);
+                    oStage.addChild(oCastleBitmap);
+                    oCastleBitmap.worldX = 2000;
+                    oCastleBitmap.worldY = 100;
+                    oStage.update();
+                };
+
+                //add tickers for movement
+                createjs.Ticker.addEventListener("tick", oStage);
+                createjs.Ticker.addEventListener("tick", placeObjects);
+            });
+
+        </script>
+    </body>
+</html>
